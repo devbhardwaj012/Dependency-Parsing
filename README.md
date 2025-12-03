@@ -1,198 +1,207 @@
-# Graph-Based Dependency Parsing (MST Parser) — Complete Project
+Graph-Based Dependency Parsing Using the MST Algorithm
 
-*Classical graph-based dependency parsing vs modern transformer-based parsing*
+This repository contains an implementation of a classical graph-based dependency parser based on the Chu–Liu–Edmonds Maximum Spanning Tree (MST) algorithm. The project demonstrates how dependency parsing was performed before the introduction of neural and transformer-based models, using manually engineered features and structured perceptron training.
 
----
+The primary goal of this project is educational: to illustrate the strengths and limitations of traditional dependency parsing methods and to provide a clear comparison with modern approaches based on contextual embeddings and self-attention mechanisms.
 
-## Overview
+Project Structure
 
-This repository implements a **graph-based dependency parser** using the **Chu-Liu-Edmonds Maximum Spanning Tree (MST)** algorithm and a **structured perceptron** training loop. It is intended as an educational, reproducible demonstration of how dependency parsing was approached before the neural/transformer era, and to highlight where classical methods succeed and where modern neural models outperform them.
+The repository consists of:
 
-If this helped you, **please star the repo and give a like/upvote** — it really helps!
+dependency-parsing/
+│
+├── dependency-parsing.ipynb   # Complete implementation, training, evaluation, and analysis
+└── README.md                  # Project documentation
 
----
 
-## What is Dependency Parsing?
+All parsing logic, feature extraction, training procedures, evaluation, and visualizations are contained within the single Jupyter Notebook.
 
-Dependency parsing builds a **directed tree** over a sentence where:
+Overview of Dependency Parsing
 
-* Every token (word) has exactly one **head** (except the ROOT).
-* Edges (head → dependent) represent syntactic/grammatical relationships (subject, object, modifier, etc.).
-* The parsed structure is used by downstream tasks like information extraction, semantic role labeling, and machine translation.
+Dependency parsing converts a sentence into a directed tree where:
 
----
+Each word has exactly one syntactic head (except the root), and
 
-## This Project — Key Components
+Edges represent grammatical relations such as subject, object, modifier, etc.
 
-* **Chu-Liu-Edmonds MST algorithm**: find the maximum spanning tree in a directed graph of arc scores.
-* **Feature-based scoring**: manual features (distance, direction, lexical items, suffixes, capitalization, position).
-* **Structured Perceptron training**: update feature weights based on gold vs predicted trees.
-* **Evaluation**: Unlabeled Attachment Score (UAS), error breakdown, and qualitative tests.
-* **Visualization**: ASCII parse-tree printer and test cases covering PP-attachment, coordination, long-range dependencies, etc.
+Dependency structures are fundamental to downstream tasks such as machine translation, semantic role labeling, question answering, and information extraction.
 
----
+Classical Dependency Parsing Methods
+1. Graph-Based Dependency Parsing
 
-## Graph-Based Parsing (How it works)
+This project implements this approach.
 
-1. Score every possible arc (head → dependent) using feature weights.
-2. Build a complete directed graph where nodes are tokens (plus ROOT).
-3. Use Chu-Liu-Edmonds to extract the **maximum spanning tree** — the highest-scoring valid dependency tree.
-4. Train with structured perceptron: increase weights for gold arcs and decrease for predicted incorrect arcs.
+Graph-based parsers treat parsing as a global optimization problem:
 
-**Strengths**
+Each possible head → dependent arc is assigned a score using a feature-based model.
 
-* Global tree optimization (MST finds the best tree under current arc scores).
-* Interpretable, lightweight, and fast (suitable for CPU-only environments).
-* Educational: shows classical structured-learning and inference.
+A complete directed graph is constructed with these scores.
 
-**Limitations**
+The MST algorithm selects the highest-scoring valid dependency tree.
 
-* Arc scores are computed independently — inter-arc dependencies are not modeled.
-* Requires heavy **feature engineering** → brittle and sparse representations.
-* Poor handling of polysemy, semantics, long-range dependencies, and rare words.
-* No benefit from unlabeled corpora (no pretraining or transfer learning).
+A structured perceptron updates weights based on the difference between predicted and gold-standard trees.
 
----
+Strengths
 
-## Transition-Based Parsing (Context)
+Global inference over the entire tree.
 
-* Uses a stack + buffer + actions (SHIFT, LEFT-ARC, RIGHT-ARC) to build trees incrementally.
-* Very fast (linear-time), but **greedy decisions** often propagate errors unless expensive beam search is used.
-* Like graph-based parsers, historically dependent on hand-crafted features.
+Mathematically principled and deterministic.
 
----
+Interpretable scoring functions.
 
-## Why Modern Neural / Transformer Parsers Win
+Efficient in terms of runtime and memory.
 
-Modern parsers replace manual features with learned continuous representations and global modeling techniques:
+Limitations
 
-* **Contextualized embeddings (BERT, RoBERTa, etc.)**: resolve polysemy and provide rich lexical semantics.
-* **Self-attention / transformers**: directly model long-range dependencies without exponential feature explosion.
-* **Pretraining on massive unlabeled data**: dramatic improvements in low-resource and cross-lingual scenarios.
-* **Biaffine and graph neural scoring**: capture interactions between candidate arcs and jointly refine predictions.
+Arc scores are computed independently; interactions between arcs are not modeled.
 
-**Typical performance (English UAS)**:
+Manual feature engineering leads to sparse and brittle representations.
 
-* Classical MST (basic): 65–75%
-* MST (engineered): 85–90%
-* BiLSTM-based: 91–95%
-* BERT-based / Transformer: 96–98%+
+Limited ability to capture long-range dependencies.
 
----
+No semantic understanding (treats words as symbols, not meanings).
 
-## When to Use Classical Parsers
+Poor performance on polysemy, ambiguity, and out-of-vocabulary words.
 
-* Educational purposes and algorithmic demonstrations.
-* Resource-constrained deployment (low memory, CPU-only).
-* When interpretability is important.
-* As reproducible baselines in research.
+2. Transition-Based Dependency Parsing
 
----
+Although not implemented here, this approach provides important context.
 
-## Quick Start
+Transition-based parsers use a stack, buffer, and a sequence of actions (SHIFT, LEFT-ARC, RIGHT-ARC) to build a parse incrementally.
 
-Install dependencies:
+Strengths
 
-```bash
+Very fast (linear-time).
+
+Suitable for incremental parsing.
+
+Limitations
+
+Greedy and prone to error propagation.
+
+Requires manual feature templates.
+
+Struggles with complex syntax and long-range dependencies.
+
+Why Classical Parsers Are Limited
+
+Traditional parsers rely on:
+
+Manually crafted features (distance, direction, suffixes, capitalization).
+
+Sparse input representations.
+
+Local or shallow contextual windows.
+
+No ability to leverage large unlabeled corpora.
+
+No contextual understanding or semantic generalization.
+
+As a result, classical models plateau around 85–90% UAS (Unlabeled Attachment Score) even with heavy feature engineering.
+
+Modern Neural and Transformer-Based Models
+
+Modern dependency parsers rely on deep learning, contextual embeddings, and self-attention.
+
+Advantages Over Classical Methods
+
+Contextual Embeddings
+Models such as BERT and RoBERTa provide different vector representations for the same word depending on context, addressing polysemy and ambiguity.
+
+Self-Attention Mechanisms
+Transformers consider the entire sentence simultaneously, allowing direct modeling of long-range dependencies.
+
+Pretraining on Large Corpora
+Neural models acquire syntactic, semantic, and world knowledge from billions of tokens, which is not possible in classical approaches.
+
+Better Generalization
+Dense embeddings enable the model to generalize across related words and structures, improving performance on rare and unseen phenomena.
+
+Superior Accuracy
+Typical performance levels:
+
+Classical MST parser: 65–90% UAS
+
+BiLSTM-based parsers: 91–95% UAS
+
+Transformer-based parsers: 96–98%+ UAS
+
+Transformer-based parsers now approach near–human-level performance.
+
+Running the Notebook
+
+Install required dependencies:
+
 pip install conllu numpy scipy scikit-learn matplotlib
-```
 
-Download UD English EWT:
 
-```bash
+Download the Universal Dependencies English EWT treebank:
+
 wget https://raw.githubusercontent.com/UniversalDependencies/UD_English-EWT/master/en_ewt-ud-train.conllu
 wget https://raw.githubusercontent.com/UniversalDependencies/UD_English-EWT/master/en_ewt-ud-dev.conllu
 wget https://raw.githubusercontent.com/UniversalDependencies/UD_English-EWT/master/en_ewt-ud-test.conllu
-```
 
-Run the notebook/script:
 
-```bash
-python your_parser_script.py
-```
+Open the notebook:
 
----
+dependency-parsing.ipynb
 
-## Files & Structure
 
-```
-├── parser.py                # MST parser, feature extractor, training, evaluation
-├── visualization.py         # Helpers for ASCII tree visualizations
-├── mst_parser_model.pkl     # Saved model (after training)
-├── data/
-│   ├── en_ewt-ud-train.conllu
-│   ├── en_ewt-ud-dev.conllu
-│   └── en_ewt-ud-test.conllu
-├── README.md                # This file
-└── requirements.txt
-```
+and execute all cells. The notebook covers:
 
----
+Data loading
 
-## Evaluation & Known Failure Modes
+Feature extraction
 
-This implementation includes a test suite for:
+MST decoding
 
-* PP-attachment ambiguity (e.g., “I saw the man with the telescope”)
-* Long-distance dependencies (wh-extraction, relative clauses)
-* Coordination ambiguity (“old men and women”)
-* Garden-path sentences (“The horse raced past the barn fell”)
+Structured perceptron training
 
-Common failure causes: lack of semantic knowledge, limited context, sparse features, independent arc scoring.
+Evaluation (UAS, error categories)
 
----
+Visualization of dependency trees
 
-## Extending & Improving This Project
+Analysis of linguistic phenomena
 
-* Replace feature-based scorer with **neural scorers** (BiLSTM + MLP or Transformer encoder).
-* Use **biaffine attention** for joint arc scoring.
-* Fine-tune a **pretrained Transformer** (BERT/XLM-R) and build a lightweight parser head.
-* Apply **multilingual pretraining / transfer learning** for low-resource languages.
-* Experiment with **graph neural networks** to iteratively refine arc scores.
+Discussion of failure cases
 
----
+Features Included in the Notebook
 
-## Cite / References
+Chu–Liu–Edmonds maximum spanning tree algorithm
 
-* Dozat, Timothy & Manning, Christopher (2017). *Deep Biaffine Attention for Neural Dependency Parsing*.
-* McDonald, Ryan et al. (2005). *Non-projective dependency parsing using spanning tree algorithms*.
-* Chu-Liu-Edmonds algorithm (maximum spanning arborescence).
+Structured perceptron training loop
 
----
+Comprehensive feature extractor
 
-## License
+ASCII dependency-tree visualization
+
+Evaluation on development and test sets
+
+Qualitative analysis on:
+
+PP-attachment ambiguity
+
+Coordination structures
+
+Long-range dependencies
+
+Relative clauses
+
+Garden-path sentences
+
+License
+
+This project is distributed under the MIT License:
 
 MIT License
-
-```
-MIT License
-
-Copyright (c) 2025 Dev Bhardwaj
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+in the Software without restriction...
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-```
+(Full MIT License text continues.)
 
----
+Acknowledgment
 
-## Support & Acknowledgements
-
-If you enjoyed this project or it helped you learn parsing, **please star the repository and give it a thumbs up / upvote** — it means a lot and helps other learners find it. Thank you!
-
----
-
+If this project is useful to you, please consider starring the repository or sharing it. It helps others discover educational material on classical and modern dependency parsing.
